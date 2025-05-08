@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Employee;
-import com.example.demo.service.EmployeeServiceImpl;
+import com.example.demo.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import java.util.Optional;
 public class EmployeeController {
 
 	@Autowired
-	private EmployeeServiceImpl employeeService;
+	private EmployeeService employeeService;
 
 	//  http://localhost:8082/employees
 	@PostMapping
