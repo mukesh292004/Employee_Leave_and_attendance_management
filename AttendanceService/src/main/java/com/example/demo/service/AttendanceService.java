@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,100 +15,80 @@ import com.example.demo.model.MonthlyReport;
 import com.example.demo.repository.AttendanceRepository;
 
 @Service
-public class AttendanceService {
+public class AttendanceService implements AttendanceInterface {
 
-    @Autowired
-    private AttendanceRepository repo;
-    
-    @Autowired
-    private LeaveClient leaveClient;
+	@Autowired
+	private AttendanceRepository repo;
 
-    public Attendance clockIn(int employeeId) {
-        LocalDate today = LocalDate.now();
-        repo.findByEmployeeIdAndDate(employeeId, today).ifPresent(a -> {
-            throw new RuntimeException("Already clocked in");
-        });
+	@Autowired
+	private LeaveClient leaveClient;
 
-        Attendance attendance = new Attendance();
-        attendance.setEmployeeId(employeeId);
-        attendance.setDate(today);
-        attendance.setClockIn(LocalDateTime.now());
+	public Attendance clockIn(int employeeId) {
+		LocalDate today = LocalDate.now();
+		repo.findByEmployeeIdAndDate(employeeId, today).ifPresent(a -> {
+			throw new RuntimeException("Already clocked in");
+		});
 
-        return repo.save(attendance);
-    }
+		Attendance attendance = new Attendance();
+		attendance.setEmployeeId(employeeId);
+		attendance.setDate(today);
+		attendance.setClockIn(LocalDateTime.now());
 
-    public Attendance clockOut(int employeeId) {
-        LocalDate today = LocalDate.now();
-        Attendance attendance = repo.findByEmployeeIdAndDate(employeeId, today)
-                .orElseThrow(() -> new RuntimeException("No clock-in record found for today"));
+		return repo.save(attendance);
+	}
 
-        attendance.setClockOut(LocalDateTime.now());
-        attendance.setWorkHours(calculateWorkHours(attendance.getClockIn(), attendance.getClockOut()));
+	public Attendance clockOut(int employeeId) {
+		LocalDate today = LocalDate.now();
+		Attendance attendance = repo.findByEmployeeIdAndDate(employeeId, today)
+				.orElseThrow(() -> new RuntimeException("No clock-in record found for today"));
 
-        return repo.save(attendance);
-    }
+		attendance.setClockOut(LocalDateTime.now());
+		attendance.setWorkHours(calculateWorkHours(attendance.getClockIn(), attendance.getClockOut()));
 
-    public List<Attendance> getAttendanceHistory(int employeeId) {
-        return repo.findAllByEmployeeId(employeeId);
-    }
+		return repo.save(attendance);
+	}
 
-   
-    private Long calculateWorkHours(LocalDateTime clockIn, LocalDateTime clockOut) {
-        Duration duration = Duration.between(clockIn, clockOut);
-        return duration.toHours();
-    }
-    
-        
+	public List<Attendance> getAttendanceHistory(int employeeId) {
+		return repo.findAllByEmployeeId(employeeId);
+	}
 
-   
+	private Long calculateWorkHours(LocalDateTime clockIn, LocalDateTime clockOut) {
+		Duration duration = Duration.between(clockIn, clockOut);
+		return duration.toHours();
+	}
 
-       
+	public Optional<MonthlyReport> getMonthlyReport(int employeeId, int month) {
+		// Fetch approved leave count
+		int approvedLeaveCount = leaveClient.getApprovedLeaveCountForMonth(employeeId, month);
 
-        public Optional<MonthlyReport> getMonthlyReport(int employeeId, int month) {
-            // Fetch approved leave count
-            int approvedLeaveCount = leaveClient.getApprovedLeaveCountForMonth(employeeId, month);
+		// Fetch attendance records for the month
+		List<Attendance> attendanceRecords = repo.findByEmployeeIdAndMonth(employeeId, month);
 
-            // Fetch attendance records for the month
-            List<Attendance> attendanceRecords = repo.findByEmployeeIdAndMonth(employeeId, month);
+		if (attendanceRecords.isEmpty()) {
+			return Optional.empty();
+		}
 
-            if (attendanceRecords.isEmpty()) {
-                return Optional.empty();
-            }
+		// Calculate present days, average working hours, min working hours, max working
+		// hours
+		int totalDaysInMonth = attendanceRecords.size();
+		int presentDays = totalDaysInMonth - approvedLeaveCount;
+		double averageWorkingHours = attendanceRecords.stream().filter(attendance -> attendance.getWorkHours() != null)
+				.mapToDouble(Attendance::getWorkHours).average().orElse(0);
+		double minWorkingHours = attendanceRecords.stream().filter(attendance -> attendance.getWorkHours() != null)
+				.mapToDouble(Attendance::getWorkHours).min().orElse(0);
+		double maxWorkingHours = attendanceRecords.stream().filter(attendance -> attendance.getWorkHours() != null)
+				.mapToDouble(Attendance::getWorkHours).max().orElse(0);
 
-            // Calculate present days, average working hours, min working hours, max working hours
-            int totalDaysInMonth = attendanceRecords.size();
-            int presentDays = totalDaysInMonth - approvedLeaveCount;
-            double averageWorkingHours = attendanceRecords.stream()
-                    .filter(attendance -> attendance.getWorkHours() != null)
-                    .mapToDouble(Attendance::getWorkHours)
-                    .average()
-                    .orElse(0);
-            double minWorkingHours = attendanceRecords.stream()
-                    .filter(attendance -> attendance.getWorkHours() != null)
-                    .mapToDouble(Attendance::getWorkHours)
-                    .min()
-                    .orElse(0);
-            double maxWorkingHours = attendanceRecords.stream()
-                    .filter(attendance -> attendance.getWorkHours() != null)
-                    .mapToDouble(Attendance::getWorkHours)
-                    .max()
-                    .orElse(0);
+		// Create the report
+		MonthlyReport report = new MonthlyReport();
+		report.setEmployeeId(employeeId);
+		report.setPresentDays(presentDays);
+		report.setAbsentDays(approvedLeaveCount);
+		report.setAverageWorkingHours(averageWorkingHours);
+		report.setMinWorkingHours(minWorkingHours);
+		report.setMaxWorkingHours(maxWorkingHours);
 
-            // Create the report
-            MonthlyReport report = new MonthlyReport();
-            report.setEmployeeId(employeeId);
-            report.setPresentDays(presentDays);
-            report.setAbsentDays(approvedLeaveCount);
-            report.setAverageWorkingHours(averageWorkingHours);
-            report.setMinWorkingHours(minWorkingHours);
-            report.setMaxWorkingHours(maxWorkingHours);
-
-            return Optional.of(report);
-        }
-
-       
-    
-
-    
+		return Optional.of(report);
+	}
 
 }
