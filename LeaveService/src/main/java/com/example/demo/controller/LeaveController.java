@@ -69,9 +69,13 @@ public class LeaveController {
 	        return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR).body("Error initializing leave balance.");
 	    }
 	}
+	@GetMapping("/leavescounts/{employeeId}/{month}")
+	public ResponseEntity<Integer> getApprovedLeaveCountForMonth(@PathVariable int employeeId, @PathVariable int month) {
+	    int count = leaveService.getApprovedLeaveCountForMonth(employeeId, month);
+	    return ResponseEntity.ok(count);
+	}
 
 	
-
 
 
 }

@@ -1,14 +1,18 @@
 package com.example.demo.service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.feignclient.LeaveClient;
 import com.example.demo.model.Attendance;
+import com.example.demo.model.MonthlyReport;
 import com.example.demo.repository.AttendanceRepository;
 
 @Service
@@ -16,6 +20,9 @@ public class AttendanceService {
 
     @Autowired
     private AttendanceRepository repo;
+    
+    @Autowired
+    private LeaveClient leaveClient;
 
     public Attendance clockIn(int employeeId) {
         LocalDate today = LocalDate.now();
@@ -46,8 +53,63 @@ public class AttendanceService {
         return repo.findAllByEmployeeId(employeeId);
     }
 
+   
     private Long calculateWorkHours(LocalDateTime clockIn, LocalDateTime clockOut) {
         Duration duration = Duration.between(clockIn, clockOut);
         return duration.toHours();
     }
+    
+        
+
+   
+
+       
+
+        public Optional<MonthlyReport> getMonthlyReport(int employeeId, int month) {
+            // Fetch approved leave count
+            int approvedLeaveCount = leaveClient.getApprovedLeaveCountForMonth(employeeId, month);
+
+            // Fetch attendance records for the month
+            List<Attendance> attendanceRecords = repo.findByEmployeeIdAndMonth(employeeId, month);
+
+            if (attendanceRecords.isEmpty()) {
+                return Optional.empty();
+            }
+
+            // Calculate present days, average working hours, min working hours, max working hours
+            int totalDaysInMonth = attendanceRecords.size();
+            int presentDays = totalDaysInMonth - approvedLeaveCount;
+            double averageWorkingHours = attendanceRecords.stream()
+                    .filter(attendance -> attendance.getWorkHours() != null)
+                    .mapToDouble(Attendance::getWorkHours)
+                    .average()
+                    .orElse(0);
+            double minWorkingHours = attendanceRecords.stream()
+                    .filter(attendance -> attendance.getWorkHours() != null)
+                    .mapToDouble(Attendance::getWorkHours)
+                    .min()
+                    .orElse(0);
+            double maxWorkingHours = attendanceRecords.stream()
+                    .filter(attendance -> attendance.getWorkHours() != null)
+                    .mapToDouble(Attendance::getWorkHours)
+                    .max()
+                    .orElse(0);
+
+            // Create the report
+            MonthlyReport report = new MonthlyReport();
+            report.setEmployeeId(employeeId);
+            report.setPresentDays(presentDays);
+            report.setAbsentDays(approvedLeaveCount);
+            report.setAverageWorkingHours(averageWorkingHours);
+            report.setMinWorkingHours(minWorkingHours);
+            report.setMaxWorkingHours(maxWorkingHours);
+
+            return Optional.of(report);
+        }
+
+       
+    
+
+    
+
 }

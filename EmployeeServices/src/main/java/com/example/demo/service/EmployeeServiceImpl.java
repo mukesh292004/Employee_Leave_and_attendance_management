@@ -48,7 +48,6 @@ public class EmployeeServiceImpl {
 
 		employee.setName(employeeDetails.getName());
 		employee.setEmail(employeeDetails.getEmail());
-		employee.setPassword(employeeDetails.getPassword());
 		employee.setRole(employeeDetails.getRole());
 		employee.setDepartment(employeeDetails.getDepartment());
 		employee.setContact(employeeDetails.getContact());
