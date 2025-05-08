@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +19,13 @@ public class Attendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @NotNull(message = "Employee ID cannot be null")
     private int employeeId;
+
+    @NotNull(message = "Date cannot be null")
     private LocalDate date;
+
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
     private Long workHours;
