@@ -52,7 +52,7 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
         	UserInfo obj = repo.findByName(authRequest.getUsername()).orElse(null);
-            return jwtService.generateToken(authRequest.getUsername(),obj.getRoles());
+            return jwtService.generateToken(authRequest.getUsername(),obj.getRole());
         } else {
             throw new UsernameNotFoundException("invalid user request !");
         }
@@ -63,4 +63,5 @@ public class AuthController {
     {
     	return service.getRoles(username);
     }
+    
 }

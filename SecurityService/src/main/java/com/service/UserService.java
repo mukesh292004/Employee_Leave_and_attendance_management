@@ -18,6 +18,8 @@ public class UserService {
 
 	@Autowired
 	private Employeeclient employeeClient;
+	
+
 
 	public String addUser(UserInfo userInfo) {
 		String name = userInfo.getName();
@@ -26,8 +28,14 @@ public class UserService {
 
 		if (obj1 == null) {
 			System.out.println("Checking if employee exists with ID: " + userInfo.getEmployeeId());
-			boolean employeeExists = employeeClient.doesEmployeeExist(userInfo.getEmployeeId());
+			boolean employeeExists = employeeClient.doesEmployeeExist(userInfo.getEmployeeId(),userInfo.getName(),userInfo.getEmail(),userInfo.getRole());
+			
 			System.out.println("Employee exists: " + employeeExists);
+			
+//		if (obj1 == null) {
+//			System.out.println("Checking if employee exists with ID: " + userInfo.getEmployeeId());
+//			boolean employeeExists = employeeClient.doesEmployeeExist(userInfo.getEmployeeId());
+//			System.out.println("Employee exists: " + employeeExists);
 
 			if (employeeExists) {
 				userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
@@ -44,7 +52,7 @@ public class UserService {
 	public String getRoles(String username) {
 		UserInfo obj2 = repository.findByName(username).orElse(null);
 		if (obj2 != null) {
-			return obj2.getRoles();
+			return obj2.getRole();
 		}
 		return "Not Found";
 	}
