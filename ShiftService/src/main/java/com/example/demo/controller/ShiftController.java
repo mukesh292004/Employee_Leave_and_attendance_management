@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.model.Shift;
-import com.example.demo.service.ShiftService;
+import com.example.demo.service.ShiftInterface;
 
 @RestController
 @RequestMapping("/shifts")
 public class ShiftController {
 
 	@Autowired
-	private ShiftService shiftService;
+	private ShiftInterface shiftService;
 
 	@GetMapping("/findall")
 	public List<Shift> getAllShifts() {
