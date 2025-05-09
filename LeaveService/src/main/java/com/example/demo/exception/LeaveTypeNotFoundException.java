@@ -5,3 +5,4 @@ public class LeaveTypeNotFoundException extends RuntimeException {
         super(message);
     }
 }
+	

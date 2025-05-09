@@ -119,11 +119,9 @@ public class LeaveService implements LeaveBalanceInterface, LeaveRequestInterfac
     public String deleteLeaveRequest(int id) {
         LeaveRequest leaveRequest = leaveRequestRepo.findById(id)
                 .orElseThrow(() -> new LeaveNotFoundException("Leave request not found."));
-
         if (!"Pending".equalsIgnoreCase(leaveRequest.getStatus())) {
             throw new LeaveAlreadyProcessedException("Leave request has already been processed.");
         }
-
         leaveRequestRepo.deleteById(id);
         return "Leave request deleted successfully";
     }
@@ -134,12 +132,10 @@ public class LeaveService implements LeaveBalanceInterface, LeaveRequestInterfac
         calendar.set(Calendar.MONTH, month - 1);
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         Date startDate = calendar.getTime();
-
         calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
         Date endDate = calendar.getTime();
-
         List<LeaveRequest> approvedLeaves = leaveRequestRepo.findByEmployeeIdAndStatusAndStartDateBetween(
-                employeeId, "Approved", startDate, endDate);
+        employeeId, "Approved", startDate, endDate);
         return approvedLeaves.size();
     }
 }
