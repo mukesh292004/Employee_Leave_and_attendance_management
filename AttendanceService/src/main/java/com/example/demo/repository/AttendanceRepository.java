@@ -20,4 +20,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Integer>
 	@Query("SELECT a FROM Attendance a WHERE a.employeeId = :employeeId AND MONTH(a.date) = :month")
 	List<Attendance> findByEmployeeIdAndMonth(@Param("employeeId") int employeeId, @Param("month") int month);
 
+	
+
 }

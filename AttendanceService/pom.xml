@@ -30,6 +30,8 @@
 		<java.version>17</java.version>
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
 	</properties>
+	
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -77,6 +79,13 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
+		
+<dependency>
+<groupId>org.slf4j</groupId>
+<artifactId>slf4j-log4j12</artifactId>
+</dependency>
+
+		
 	</dependencies>
 
 	<build>
@@ -118,5 +127,7 @@
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
+		
 	</dependencyManagement>
+	
 </project>

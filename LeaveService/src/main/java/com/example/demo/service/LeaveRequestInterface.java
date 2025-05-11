@@ -12,4 +12,5 @@ public interface LeaveRequestInterface {
     List<LeaveRequest> getAllLeaveRequests();
     List<LeaveRequest> getLeaveHistoryByStatus(String status);
     int getApprovedLeaveCountForMonth(int employeeId, int month);
+    void deleteByEmployeeId(int id);
 }

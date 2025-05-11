@@ -8,4 +8,5 @@ public interface LeaveBalanceInterface {
     List<LeaveBalance> getLeaveBalance(int employeeId);
     void initializeLeaveBalanceForEmployee(int employeeId);
     String deleteLeaveRequest(int id);
+    void deleteByEmployeeId(int id);
 }

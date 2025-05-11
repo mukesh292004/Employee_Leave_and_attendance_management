@@ -4,6 +4,7 @@ import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.ConflictException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.ValidationException;
+import com.example.demo.feignclient.AttendanceClient;
 import com.example.demo.feignclient.LeaveClient;
 import com.example.demo.model.Employee;
 import com.example.demo.repository.EmployeeRepository;
@@ -21,6 +22,8 @@ public class EmployeeService implements EmployeeInterface {
 
     @Autowired
     private LeaveClient leaveServiceClient;
+    @Autowired
+    private AttendanceClient attendanceClient;
 
     @Override
     public Employee saveEmployee(Employee employee) {
@@ -54,13 +57,7 @@ public class EmployeeService implements EmployeeInterface {
         return employeeRepository.findByEmail(email);
     }
 
-    @Override
-    public void deleteEmployee(Integer id) {
-        if (!employeeRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Employee not found with id " + id);
-        }
-        employeeRepository.deleteById(id);
-    }
+   
 
     @Override
     public Employee updateEmployee(Integer id, Employee employeeDetails) {
@@ -84,6 +81,17 @@ public class EmployeeService implements EmployeeInterface {
     @Override
     public boolean doesEmployeeExist(Integer id) {
         return employeeRepository.findById(id).isPresent();
+    }
+    @Override
+    public void deleteEmployee(Integer id) {
+        if (!employeeRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Employee not found with id " + id);
+        }
+
+        leaveServiceClient.deleteLeavesByEmployee(id);           // Feign call to Leave Service
+        attendanceClient.deleteAttendancesByEmployee(id); // Feign call to Attendance Service
+
+        employeeRepository.deleteById(id);
     }
     
 }

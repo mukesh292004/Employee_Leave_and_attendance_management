@@ -1,6 +1,5 @@
 package com.example.demo.repository;
 
-
 import java.util.Date;
 import java.util.List;
 
@@ -11,12 +10,11 @@ import com.example.demo.model.LeaveRequest;
 
 @Repository
 public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Integer> {
-	List<LeaveRequest> findByEmployeeId(Long employeeId);
+	List<LeaveRequest> findByEmployeeId(int employeeId);
 
 	List<LeaveRequest> findByStatus(String status);
-	List<LeaveRequest> findByEmployeeIdAndStatusAndStartDateBetween(int employeeId, String status, Date startDate, Date endDate);
 
-
-	
+	List<LeaveRequest> findByEmployeeIdAndStatusAndStartDateBetween(int employeeId, String status, Date startDate,
+			Date endDate);
 
 }

@@ -138,4 +138,11 @@ public class LeaveService implements LeaveBalanceInterface, LeaveRequestInterfac
         employeeId, "Approved", startDate, endDate);
         return approvedLeaves.size();
     }
+    @Override
+    public void deleteByEmployeeId(int employeeId) {
+        leaveRequestRepo.deleteById(employeeId);
+        leaveBalanceRepo.deleteById(employeeId);
+    }
+
+	
 }

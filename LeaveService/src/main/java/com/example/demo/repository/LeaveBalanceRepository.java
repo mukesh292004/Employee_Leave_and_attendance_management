@@ -10,7 +10,7 @@ import com.example.demo.model.LeaveBalance;
 
 @Repository
 public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, Integer> {
-	List<LeaveBalance> findByEmployeeId(Long employeeId);
+	List<LeaveBalance> findByEmployeeId(long employeeId);
 	Optional<LeaveBalance> findByEmployeeIdAndLeaveType(long employeeId, String leaveType);
 	
 

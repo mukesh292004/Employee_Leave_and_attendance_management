@@ -15,4 +15,6 @@ public interface AttendanceInterface {
 	List<Attendance> getAttendanceHistory(int employeeId);
 
 	Optional<MonthlyReport> getMonthlyReport(int employeeId, int month);
+	
+	void deleteAttendancesByEmployee(int id);
 }

@@ -71,4 +71,9 @@ public class LeaveController {
         int count = leaveService.getApprovedLeaveCountForMonth(employeeId, month);
         return ResponseEntity.ok(count);
     }
+    @DeleteMapping("/deleteById/{employeeId}")
+    public ResponseEntity<String> deleteLeavesByEmployee(@PathVariable int employeeId) {
+        leaveService.deleteByEmployeeId(employeeId);
+        return ResponseEntity.ok("All leave records deleted for employee ID: " + employeeId);
+    }
 }
