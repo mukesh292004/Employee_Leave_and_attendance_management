@@ -112,7 +112,7 @@ public class AttendanceService implements AttendanceInterface {
 	}
 
 	public void deleteAttendancesByEmployee(int employeeId) {
-		repo.deleteById(employeeId);
+		repo.deleteByEmployeeId(employeeId);
 	}
 
 }

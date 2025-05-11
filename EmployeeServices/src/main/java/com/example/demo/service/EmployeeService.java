@@ -87,10 +87,8 @@ public class EmployeeService implements EmployeeInterface {
         if (!employeeRepository.existsById(id)) {
             throw new ResourceNotFoundException("Employee not found with id " + id);
         }
-
-        leaveServiceClient.deleteLeavesByEmployee(id);           // Feign call to Leave Service
-        attendanceClient.deleteAttendancesByEmployee(id); // Feign call to Attendance Service
-
+        leaveServiceClient.deleteLeavesByEmployee(id);          
+        attendanceClient.deleteAttendancesByEmployee(id); 
         employeeRepository.deleteById(id);
     }
     

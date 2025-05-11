@@ -140,8 +140,8 @@ public class LeaveService implements LeaveBalanceInterface, LeaveRequestInterfac
     }
     @Override
     public void deleteByEmployeeId(int employeeId) {
-        leaveRequestRepo.deleteById(employeeId);
-        leaveBalanceRepo.deleteById(employeeId);
+        leaveRequestRepo.deleteByEmployeeId(employeeId);
+        leaveBalanceRepo.deleteByEmployeeId(employeeId);
     }
 
 	
