@@ -2,11 +2,11 @@ package com.example.demo.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Positive;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 public class Shift {
+
     @Id
     @Positive(message = "ID must be a positive number")
     private int id;
@@ -28,11 +29,11 @@ public class Shift {
 
     @NotNull(message = "Shift date is mandatory")
     @FutureOrPresent(message = "Shift date must be in the present or future")
-    private String shiftDate;
+    private LocalDate shiftDate;
 
-    @NotBlank(message = "Shift time is mandatory")
-    @Pattern(regexp = "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", message = "Shift time must be in HH:mm format")
-    private String shiftTime;
+    @NotNull(message = "Shift time is mandatory")
+    private LocalTime shiftTime;
 
-    private boolean swapRequested;
+    @Column(nullable = false)
+    private boolean swapRequested = false;
 }
