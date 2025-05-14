@@ -9,4 +9,5 @@ public interface LeaveBalanceInterface {
     void initializeLeaveBalanceForEmployee(int employeeId);
     String deleteLeaveRequest(int id);
     void deleteByEmployeeId(int id);
+	void resetAllLeaveBalances();
 }

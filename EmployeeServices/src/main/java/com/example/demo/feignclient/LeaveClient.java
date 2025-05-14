@@ -10,7 +10,7 @@ public interface LeaveClient {
 
     @PostMapping("/initialize/{employeeId}")
     void initializeLeaveBalance(@PathVariable("employeeId") int employeeId);
-
+    // client for deleting employee LeaveBalance when employee is deleted 
     @DeleteMapping("/deleteById/{employeeId}")
     void deleteLeavesByEmployee(@PathVariable("employeeId") int employeeId);
 }

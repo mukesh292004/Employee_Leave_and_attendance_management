@@ -1,61 +1,69 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Employee;
-import com.example.demo.service.EmployeeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.model.Employee;
+import com.example.demo.service.EmployeeService;
+
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/employees")
+@AllArgsConstructor
 public class EmployeeController {
 
-	@Autowired
 	private EmployeeService employeeService;
 
-	// http://localhost:8082/employees
+	//Employee Creation
 	@PostMapping
 	public Employee createEmployee(@RequestBody Employee employee) {
 		return employeeService.saveEmployee(employee);
 	}
 
-	// http://localhost:8082/employees
+	// getAllEmployees
 	@GetMapping
 	public List<Employee> getAllEmployees() {
 		return employeeService.getAllEmployees();
 	}
 
-	// http://localhost:8082/employees/{id}
+	// get employee by ID
 	@GetMapping("/{id}")
 	public Optional<Employee> getEmployeeById(@PathVariable Integer id) {
 		return employeeService.getEmployeeById(id);
 	}
 
-	// http://localhost:8082/employees/email/{email}
+	//getEmployee by Email
 	@GetMapping("/email/{email}")
 	public Optional<Employee> getEmployeeByEmail(@PathVariable String email) {
 		return employeeService.getEmployeeByEmail(email);
 	}
 
-	// http://localhost:8082/employees/{id}
+	// update the Employee details
 	@PutMapping("/{id}")
 	public Employee updateEmployee(@PathVariable Integer id, @RequestBody Employee employeeDetails) {
 		return employeeService.updateEmployee(id, employeeDetails);
 	}
 
-	// http://localhost:8082/employees/{id}
+	// Delete employee By ID
 	@DeleteMapping("/{id}")
-	public void deleteEmployee(@PathVariable Integer id) {
-		employeeService.deleteEmployee(id);
+	public ResponseEntity<String> deleteEmployee(@PathVariable Integer id) {
+	    employeeService.deleteEmployee(id);
+	    return ResponseEntity.ok("Employee ID " + id + " successfully deleted.");
 	}
 
-//	@GetMapping("/check/{id}")
-//	public boolean doesEmployeeExist(@PathVariable Integer id) {
-//	    return employeeService.getEmployeeById(id).isPresent();
-//	}
 
+   // check wheather the Employee exist or not ...
 	@GetMapping("/check/{id}/{name}/{email}/{role}")
 	public boolean doesEmployeeExist(@PathVariable Integer id, @PathVariable String name, @PathVariable String email, @PathVariable String role) {
 	    Optional<Employee> existingEmployee = employeeService.getEmployeeById(id);

@@ -1,4 +1,4 @@
- package com.controller;
+package com.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,49 +19,47 @@ import com.repository.UserInfoRepository;
 import com.service.JwtService;
 import com.service.UserService;
 
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin("*")
+@AllArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private UserService service;
-    @Autowired
-    private JwtService jwtService;
-    
-    @Autowired
-    private UserInfoRepository repo;
+	private UserService service;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	private JwtService jwtService;
 
-    @GetMapping("/welcome")		//http://localhost:9090/auth/welcome
-    public String welcome() {
-        return "Welcome this endpoint is not secure";
-    }
+	private UserInfoRepository repo;
 
-    @PostMapping("/new")	//http://localhost:9090/auth/new
-    public String addNewUser(@RequestBody UserInfo userInfo) {
-        return service.addUser(userInfo);
-    }
+	private AuthenticationManager authenticationManager;
 
+	@GetMapping("/welcome")
+	public String welcome() {
+		return "Welcome this endpoint is not secure";
+	}
 
+	@PostMapping("/new")
+	public String addNewUser(@RequestBody UserInfo userInfo) {
+		return service.addUser(userInfo);
+	}
 
-    @PostMapping("/authenticate")		//http://localhost:9090/auth/authenticate
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        if (authentication.isAuthenticated()) {
-        	UserInfo obj = repo.findByName(authRequest.getUsername()).orElse(null);
-            return jwtService.generateToken(authRequest.getUsername(),obj.getRole());
-        } else {
-            throw new UsernameNotFoundException("invalid user request !");
-        }
-    }
-    
-    @GetMapping("/getroles/{username}")		//http://localhost:9090/auth/getroles/{username}
-    public String getRoles(@PathVariable String username)
-    {
-    	return service.getRoles(username);
-    }
-    
+	@PostMapping("/authenticate")
+	public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+		if (authentication.isAuthenticated()) {
+			UserInfo obj = repo.findByName(authRequest.getUsername()).orElse(null);
+			return jwtService.generateToken(authRequest.getUsername(), obj.getRole(), obj.getEmployeeId());
+		} else {
+			throw new UsernameNotFoundException("invalid user request !");
+		}
+	}
+
+	@GetMapping("/getroles/{username}") 
+	public String getRoles(@PathVariable String username) {
+		return service.getRoles(username);
+	}
+
 }

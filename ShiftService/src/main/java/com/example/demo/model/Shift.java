@@ -28,11 +28,11 @@ public class Shift {
     private String name;
 
     @NotNull(message = "Shift date is mandatory")
-    @FutureOrPresent(message = "Shift date must be in the present or future")
-    private LocalDate shiftDate;
+//    @FutureOrPresent(message = "Shift date must be in the present or future")
+    private String shiftDate;
 
     @NotNull(message = "Shift time is mandatory")
-    private LocalTime shiftTime;
+    private String shiftTime;
 
     @Column(nullable = false)
     private boolean swapRequested = false;

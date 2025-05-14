@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @FeignClient(name = "ATTENDANCESERVICE", path = "/attendance")
 public interface AttendanceClient {
-    @PostMapping("/initialize/{employeeId}")
-    void initializeLeaveBalance(@PathVariable("employeeId") int employeeId);
-
+	
+    // client for deleting employee attendance when employee is deleted 
     @DeleteMapping("/delete/{employeeId}")
     void deleteAttendancesByEmployee(@PathVariable("employeeId") int employeeId);
 }

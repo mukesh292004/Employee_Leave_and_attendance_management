@@ -1,6 +1,5 @@
 package com.example.demo.exception;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,58 +13,43 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    private Map<String, Object> createResponse(HttpStatus status, String error, String message, String path) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
-        response.put("error", "Validation Error");
-        response.put("message", ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
-        response.put("path", "/shifts");
+        response.put("status", status.value());
+        response.put("error", error);
+        response.put("message", message);
+        response.put("path", path);
+        return response;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, Object> response = createResponse(HttpStatus.BAD_REQUEST, "Validation Error", ex.getBindingResult().getAllErrors().get(0).getDefaultMessage(), "/shifts");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SwapRequestException.class)
     public ResponseEntity<Map<String, Object>> handleSwapRequestException(SwapRequestException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.CONFLICT.value());
-        response.put("error", "Swap Request Error");
-        response.put("message", ex.getMessage());
-        response.put("path", "/shifts/requestSwap");
+        Map<String, Object> response = createResponse(HttpStatus.CONFLICT, "Swap Request Error", ex.getMessage(), "/shifts/requestSwap");
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(InvalidShiftDataException.class)
     public ResponseEntity<Map<String, Object>> handleInvalidShiftDataException(InvalidShiftDataException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Invalid Shift Data");
-        response.put("message", ex.getMessage());
-        response.put("path", "/shifts/save");
+        Map<String, Object> response = createResponse(HttpStatus.BAD_REQUEST, "Invalid Shift Data", ex.getMessage(), "/shifts/save");
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ShiftNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleShiftNotFoundException(ShiftNotFoundException ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", "Shift Not Found");
-        response.put("message", ex.getMessage());
-        response.put("path", "/shifts/findById");
+        Map<String, Object> response = createResponse(HttpStatus.NOT_FOUND, "Shift Not Found", ex.getMessage(), "/shifts/findById");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        response.put("error", "Internal Server Error");
-        response.put("message", ex.getMessage());
-        response.put("path", "/shifts");
+        Map<String, Object> response = createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), "/shifts");
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
-

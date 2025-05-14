@@ -23,4 +23,9 @@ public interface LeaveBalanceRepository extends JpaRepository<LeaveBalance, Inte
 	@Query("DELETE FROM LeaveBalance lb WHERE lb.employeeId = :employeeId")
 	void deleteByEmployeeId(int employeeId);
 
+	@Transactional
+	@Modifying
+	@Query("UPDATE LeaveBalance lb SET lb.balance = :balance WHERE lb.leaveType = :leaveType")
+	void resetAllLeaveBalances(int balance, String leaveType);
+
 }

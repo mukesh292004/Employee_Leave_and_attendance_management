@@ -4,20 +4,20 @@ import com.example.demo.model.Employee;
 
 import java.util.List;
 import java.util.Optional;
+
 public interface EmployeeInterface {
 
-	    Employee saveEmployee(Employee employee);
+	Employee saveEmployee(Employee employee);
 
-	    List<Employee> getAllEmployees();
+	List<Employee> getAllEmployees();
 
-	    Optional<Employee> getEmployeeById(Integer id);
+	Optional<Employee> getEmployeeById(Integer id);
 
-	    Optional<Employee> getEmployeeByEmail(String email);
+	Optional<Employee> getEmployeeByEmail(String email);
 
-	    void deleteEmployee(Integer id);
+	void deleteEmployee(Integer id);
 
-	    Employee updateEmployee(Integer id, Employee employeeDetails);
+	Employee updateEmployee(Integer id, Employee employeeDetails);
 
-	    boolean doesEmployeeExist(Integer id);
-	}
-
+	boolean doesEmployeeExist(Integer id);
+}

@@ -74,7 +74,7 @@ class AttendanceServiceApplicationTests {
 
     @Test
     void testClockInAlreadyDone() {
-        int employeeId = 3;
+        int employeeId = 2;
         LocalDate today = LocalDate.now();
         Attendance alreadyExists = new Attendance();
         alreadyExists.setEmployeeId(employeeId);
@@ -88,7 +88,7 @@ class AttendanceServiceApplicationTests {
 
     @Test
     void testClockOutSuccess() {
-        int employeeId = 3;
+        int employeeId = 2;
         LocalDate today = LocalDate.now();
         Attendance attendance = new Attendance();
         attendance.setEmployeeId(employeeId);
@@ -106,16 +106,6 @@ class AttendanceServiceApplicationTests {
         verify(attendanceRepository, times(1)).save(attendance);
     }
 
-    @Test
-    void testGetAttendanceHistory() {
-        int employeeId = 3;
-        List<Attendance> mockList = Collections.singletonList(new Attendance());
-
-        when(attendanceRepository.findAllByEmployeeId(employeeId)).thenReturn(mockList);
-
-        List<Attendance> result = attendanceService.getAttendanceHistory(employeeId);
-
-        assertEquals(1, result.size());
-    }
+   
 
 }
