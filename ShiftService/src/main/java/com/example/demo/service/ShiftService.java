@@ -47,6 +47,11 @@ public class ShiftService implements ShiftInterface {
                 throw new InvalidShiftDataException("Shift date cannot be in the past");
             }
 
+            // Validate shift time format (HH:mm:ss)
+            if (!isValidTimeFormat(shift.getShiftTime())) {
+                throw new InvalidShiftDataException("Invalid shift time format. Please use HH:mm:ss");
+            }
+
             repository.save(shift);
         } catch (Exception e) {
             throw new RuntimeException("Error saving shift", e);
@@ -136,6 +141,26 @@ public class ShiftService implements ShiftInterface {
             }
         } else {
             throw new ShiftNotFoundException("Shift not found with ID: " + id);
+        }
+    }
+
+    // Helper method to validate shift time format (HH:mm:ss)
+    private boolean isValidTimeFormat(String time) {
+        try {
+            String[] parts = time.split(":");
+            if (parts.length == 3) {
+                int hour = Integer.parseInt(parts[0]);
+                int minute = Integer.parseInt(parts[1]);
+                int second = Integer.parseInt(parts[2]);
+
+                // Validate each part of the time
+                if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60 && second >= 0 && second < 60) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }
