@@ -1,15 +1,11 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Shift {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Auto-generate the ID
     @Positive(message = "ID must be a positive number")
     private int id;
 
@@ -28,11 +25,11 @@ public class Shift {
     private String name;
 
     @NotNull(message = "Shift date is mandatory")
-//    @FutureOrPresent(message = "Shift date must be in the present or future")
-    private String shiftDate;
+    @FutureOrPresent(message = "Shift date must be in the present or future")
+    private LocalDate shiftDate;
 
     @NotNull(message = "Shift time is mandatory")
-    private String shiftTime;
+    private LocalTime shiftTime;
 
     @Column(nullable = false)
     private boolean swapRequested = false;
