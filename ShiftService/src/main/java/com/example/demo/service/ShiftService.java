@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,15 +30,23 @@ public class ShiftService implements ShiftInterface {
 
     @Override
     public Shift findById(int id) {
-        return repository.findById(id).orElseThrow(() -> new ShiftNotFoundException("Shift not found with ID: " + id));
+        return repository.findById(id)
+                .orElseThrow(() -> new ShiftNotFoundException("Shift not found with ID: " + id));
     }
 
     @Override
     public void save(Shift shift) {
         try {
-            if (shift.getId() <= 0 || shift.getEmployeeId() <= 0 || shift.getName() == null || shift.getShiftDate() == null || shift.getShiftTime() == null) {
+            // Validate shift data
+            if (shift.getEmployeeId() <= 0 || shift.getName() == null || shift.getShiftDate() == null || shift.getShiftTime() == null) {
                 throw new InvalidShiftDataException("Invalid shift data provided");
             }
+
+            // Ensure that the shift date is not in the past
+            if (shift.getShiftDate().isBefore(LocalDate.now())) {
+                throw new InvalidShiftDataException("Shift date cannot be in the past");
+            }
+
             repository.save(shift);
         } catch (Exception e) {
             throw new RuntimeException("Error saving shift", e);
@@ -47,8 +56,13 @@ public class ShiftService implements ShiftInterface {
     @Override
     public String deleteById(int id) {
         try {
-            repository.deleteById(id);
-            return "Shift Deleted";
+            Optional<Shift> shift = repository.findById(id);
+            if (shift.isPresent()) {
+                repository.deleteById(id);
+                return "Shift Deleted";
+            } else {
+                throw new ShiftNotFoundException("Shift not found with ID: " + id);
+            }
         } catch (Exception e) {
             throw new ShiftNotFoundException("Shift not found with ID: " + id);
         }
@@ -59,6 +73,9 @@ public class ShiftService implements ShiftInterface {
         Optional<Shift> optionalShift = repository.findById(id);
         if (optionalShift.isPresent()) {
             Shift shift = optionalShift.get();
+            if (shift.isSwapRequested()) {
+                throw new SwapRequestException("Swap request has already been submitted for this shift");
+            }
             shift.setSwapRequested(true);
             repository.save(shift);
             return "Swap request submitted";
@@ -76,21 +93,30 @@ public class ShiftService implements ShiftInterface {
             Shift shift1 = optionalShift1.get();
             Shift shift2 = optionalShift2.get();
 
-            if (shift1.isSwapRequested() && shift2.isSwapRequested() && !shift1.getShiftTime().equals(shift2.getShiftTime())) {
-                int tempEmployeeId = shift1.getEmployeeId();
-                shift1.setEmployeeId(shift2.getEmployeeId());
-                shift2.setEmployeeId(tempEmployeeId);
-
-                shift1.setSwapRequested(false);
-                shift2.setSwapRequested(false);
-
-                repository.save(shift1);
-                repository.save(shift2);
-
-                return "Swap approved and shifts updated";
-            } else {
-                throw new SwapRequestException("Swap conditions not met or not requested");
+            // Ensure both shifts have requested a swap
+            if (!shift1.isSwapRequested() || !shift2.isSwapRequested()) {
+                throw new SwapRequestException("Both shifts must request a swap");
             }
+
+            // Ensure the shifts are not the same (avoid swapping the same shift)
+            if (shift1.getId() == shift2.getId()) {
+                throw new SwapRequestException("Cannot swap the same shift");
+            }
+
+            // Swap employee IDs
+            int tempEmployeeId = shift1.getEmployeeId();
+            shift1.setEmployeeId(shift2.getEmployeeId());
+            shift2.setEmployeeId(tempEmployeeId);
+
+            // Reset swapRequested flag
+            shift1.setSwapRequested(false);
+            shift2.setSwapRequested(false);
+
+            // Save updated shifts
+            repository.save(shift1);
+            repository.save(shift2);
+
+            return "Swap approved and shifts updated";
         } else {
             throw new ShiftNotFoundException("One or both shifts not found");
         }
